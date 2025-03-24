@@ -1,0 +1,75 @@
+version: "3"
+
+volumes: # 自定义数据卷
+  db_vol: #定义数据卷同步存放容器内mysql数据
+  redis_vol: #定义数据卷同步存放redis数据
+  media_vol: #定义数据卷同步存放web项目用户上传到media文件夹的数据
+  static_vol: #定义数据卷同步存放web项目static文件夹的数据
+
+networks: # 自定义网络(默认桥接)
+  zoysiadb_network:
+    driver: bridge
+
+services:
+  zoysiadb_redis:
+    image: redis:latest
+    command: redis-server /etc/redis/redis.conf # 容器启动后启动redis服务器
+    networks:
+      - zoysiadb_network
+    volumes:
+      - redis_vol:/data # 通过挂载给redis数据备份
+      - ./compose/zoysiadb_redis/redis.conf:/etc/redis/redis.conf # 挂载redis配置文件
+    ports:
+      - "4001:6379"
+    restart: always # always表示容器运行发生错误时一直重启
+
+  zoysiadb_db:
+    image: mysql:latest
+    env_file:  
+      - ./zoysiadb_project/.env # 使用了环境变量文件
+    networks:  
+      - zoysiadb_network
+    volumes:
+      - db_vol:/var/lib/mysql:rw # 挂载数据库数据, 可读可写
+      - ./compose/zoysiadb_mysql/conf/my.cnf:/etc/mysql/my.cnf # 挂载配置文件
+      - ./compose/zoysiadb_mysql/init:/docker-entrypoint-initdb.d/ # 挂载数据初始化sql脚本
+    ports:
+      - "4002:3306" # 与配置文件保持一致
+    restart: always
+
+  zoysiadb_web:
+    build: ./zoysiadb_project
+    expose:
+      - "8000"
+    volumes:
+      - ./zoysiadb_project:/var/www/html/zoysiadb_project # 挂载项目代码
+      - static_vol:/var/www/html/zoysiadb_project/static # 以数据卷挂载容器内static文件
+      - media_vol:/var/www/html/zoysiadb_project/media # 以数据卷挂载容器内用户上传媒体文件
+      - ./compose/zoysiadb_uwsgi:/tmp # 挂载uwsgi日志
+    networks:
+      - zoysiadb_network  
+    depends_on:
+      - zoysiadb_redis
+      - zoysiadb_db
+    restart: always
+    tty: true
+    stdin_open: true
+
+  zoysiadb_nginx:
+    build: ./compose/zoysiadb_nginx
+    ports:
+      - "4003:80"
+      - "4443:443"
+    expose:
+      - "80"
+    volumes:
+      - ./compose/zoysiadb_nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf # 挂载nginx配置文件
+      - ./compose/zoysiadb_nginx/ssl:/usr/share/nginx/ssl # 挂载ssl证书目录
+      - ./compose/zoysiadb_nginx/log:/var/log/nginx # 挂载日志
+      - static_vol:/usr/share/nginx/html/static # 挂载静态文件
+      - media_vol:/usr/share/nginx/html/media # 挂载用户上传媒体文件
+    networks:
+      - zoysiadb_network
+    depends_on:
+      - zoysiadb_web
+    restart: always
