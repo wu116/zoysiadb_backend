@@ -1,14 +1,22 @@
 from django.shortcuts import render
 import json
 import os
+import re
 import uuid
 import subprocess
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.template.context_processors import csrf
+from django.http import HttpResponse
 from django.conf import settings
 from .config import BLAST_CONFIG
 
 # Create your views here.
+
+def get_csrf(request):
+    x = csrf(request)
+    csrf_token = x['csrf_token']
+    return HttpResponse('{} ; {}'.format(str(re), csrf_token))
 
 def blast_request(request):
     """处理 BLAST 请求的核心入口"""
@@ -31,7 +39,7 @@ def blast_request(request):
         # 获取数据库路径
         db_path = BLAST_CONFIG[program]['databases'].get(db_key)
         if not db_path or not os.path.exists(db_path):
-            raise ValueError(f"Database {db_key} not found")
+            raise ValueError(f"Database {db_path} not found")
         
         # 生成唯一文件名
         file_id = uuid.uuid4().hex

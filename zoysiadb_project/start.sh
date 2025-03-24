@@ -11,7 +11,7 @@ while ! nc -z zoysiadb_db 3306 ; do
     sleep 3
 done
 
-python manage.py collectstatic --noinput &&
+python manage.py collectstatic -c --noinput &&
 	python manage.py makemigrations &&
 	python manage.py migrate &&
 	uwsgi --ini /var/www/html/zoysiadb_project/uwsgi.ini &&

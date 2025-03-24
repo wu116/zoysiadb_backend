@@ -11,13 +11,13 @@ BLAST_CONFIG = {
     },
     'blastp': {
         'databases': {
-            'protein': os.path.join(settings.MEDIA_ROOT, '/blast_db/protein/ZJLY_hap1.pep')
+            'protein': os.path.join(settings.MEDIA_ROOT, 'blast_db/protein/ZJLY_hap1.pep')
         },
         'command': 'blastp'
     },
     'tblastn': {
         'databases': {
-            'ZJLY_hap1.pep': os.path.join(settings.MEDIA_ROOT, '/blast_db/protein/ZJLY_hap1.pep')
+            'ZJLY_hap1.pep': os.path.join(settings.MEDIA_ROOT, 'blast_db/protein/ZJLY_hap1.pep')
         },
         'command': 'blastp'
     },
