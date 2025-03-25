@@ -22,5 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', include('genomedb.urls')),
     path('', TemplateView.as_view(template_name="index.html")),
-    path('api/blast', include('blast.urls')),
+    path('api/blast/', include('blast.urls')),
 ]

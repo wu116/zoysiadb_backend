@@ -4,7 +4,13 @@ FROM python:3.9
 COPY sources.list sources.list
 
 # 安装netcat
-RUN bash sources.list && apt-key adv --keyserver keyserver.ubuntu.com --recv 3B4FE6ACC0B21F32 && apt-get update && apt install -y netcat
+RUN bash sources.list \
+&& apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 3B4FE6ACC0B21F32 \
+&& apt-get update \
+&& apt install -y netcat \
+&& apt-get install -y cron \
+&& apt-get install -y nano \
+&& apt-get install -y ncbi-blast+
 
 # 作者
 MAINTAINER wu116

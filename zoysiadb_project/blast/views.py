@@ -9,6 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.context_processors import csrf
 from django.http import HttpResponse
 from django.conf import settings
+from rest_framework import generics
+from .models import BlastDBFILE
+from .serializers import BlastDBFileSerializer
 from .config import BLAST_CONFIG
 
 # Create your views here.
@@ -17,6 +20,10 @@ def get_csrf(request):
     x = csrf(request)
     csrf_token = x['csrf_token']
     return HttpResponse('{} ; {}'.format(str(re), csrf_token))
+
+class get_blastdb(generics.ListAPIView):
+    queryset = BlastDBFILE.objects.all()
+    serializer_class = BlastDBFileSerializer
 
 def blast_request(request):
     """处理 BLAST 请求的核心入口"""
