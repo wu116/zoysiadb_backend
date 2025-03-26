@@ -12,7 +12,9 @@ from django.conf import settings
 from rest_framework import generics
 from .models import BlastDBFILE
 from .serializers import BlastDBFileSerializer
-from .config import BLAST_CONFIG
+from .config import get_blast_config
+
+BLAST_CONFIG = get_blast_config()
 
 # Create your views here.
 
