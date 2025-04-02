@@ -119,6 +119,11 @@ def _parse_blast_output(output_path):
                 'qseqid': fields[0],
                 'sseqid': fields[1],
                 'pident': float(fields[2]),
+                'length': float(fields[3]),
+                'qstart': float(fields[6]),
+                'qend': float(fields[7]),
+                'sstart': float(fields[8]),
+                'send': float(fields[9]),
                 'evalue': float(fields[10]),
                 'bitscore': float(fields[11])
             })
